@@ -19,25 +19,25 @@ class LoginPageState extends State<LoginPage> {
   String? password;
 
   void login() async {
-  setState(() {
-    _isLoading = true;
-  });
-
-  try {
-    await _auth.signInWithEmailAndPassword(
-        email: email!, password: password!);
-
-    Navigator.pushNamedAndRemoveUntil(
-        context, '/dashboard', ModalRoute.withName('/dashboard'));
-  } catch (e) {
-    final snackbar = SnackBar(content: Text(e.toString()));
-    ScaffoldMessenger.of(context).showSnackBar(snackbar);
-  } finally {
     setState(() {
-      _isLoading = false;
+      _isLoading = true;
     });
+
+    try {
+      await _auth.signInWithEmailAndPassword(
+          email: email!, password: password!);
+
+      Navigator.pushNamedAndRemoveUntil(
+          context, '/dashboard', ModalRoute.withName('/dashboard'));
+    } catch (e) {
+      final snackbar = SnackBar(content: Text(e.toString()));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +52,7 @@ class LoginPageState extends State<LoginPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 80),
-                    Text('Login', style: headerStyle(level:2)),
+                    Text('Login', style: headerStyle(level: 2)),
                     Container(
                       child: const Text(
                         'Login to your account',
@@ -67,37 +67,37 @@ class LoginPageState extends State<LoginPage> {
                           child: Column(
                             children: [
                               InputLayout(
-    'Email',
-    TextFormField(
-        onChanged: (String value) => setState(() {
-              email = value;
-            }),
-        validator: notEmptyValidator,
-        decoration: customInputDecoration(
-            "email@email.com"))),
-InputLayout(
-    'Password',
-    TextFormField(
-        onChanged: (String value) => setState(() {
-              password = value;
-            }),
-        validator: notEmptyValidator,
-        obscureText: true,
-        decoration: customInputDecoration(""))),
-Container(
-  margin: EdgeInsets.only(top: 20),
-  width: double.infinity,
-  child: FilledButton(
-      style: buttonStyle,
-      child: Text('Login',
-          style:
-              headerStyle(level: 3, dark: false)),
-      onPressed: () {
-        if (_formKey.currentState!.validate()) {
-          // login();
-        }
-      }),
-)
+                                  'Email',
+                                  TextFormField(
+                                      onChanged: (String value) => setState(() {
+                                            email = value;
+                                          }),
+                                      validator: notEmptyValidator,
+                                      decoration: customInputDecoration(
+                                          "email@email.com"))),
+                              InputLayout(
+                                  'Password',
+                                  TextFormField(
+                                      onChanged: (String value) => setState(() {
+                                            password = value;
+                                          }),
+                                      validator: notEmptyValidator,
+                                      obscureText: true,
+                                      decoration: customInputDecoration(""))),
+                              Container(
+                                margin: EdgeInsets.only(top: 20),
+                                width: double.infinity,
+                                child: FilledButton(
+                                    style: buttonStyle,
+                                    child: Text('Login',
+                                        style:
+                                            headerStyle(level: 3, dark: false)),
+                                    onPressed: () {
+                                      if (_formKey.currentState!.validate()) {
+                                        login();
+                                      }
+                                    }),
+                              )
                             ],
                           )),
                     ),
