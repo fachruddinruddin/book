@@ -69,7 +69,7 @@ class _MyLaporanState extends State<MyLaporan> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Laporan'),
+        title: Text('Akun Game'),
       ),
       body: SafeArea(
         child: Container(

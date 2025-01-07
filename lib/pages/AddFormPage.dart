@@ -22,6 +22,7 @@ class AddFormState extends State<AddFormPage> {
   final _storage = FirebaseStorage.instance;
 
   bool _isLoading = false;
+  final List<String> infoStatus = ['Active', 'Inactive', 'Pending']; // Define the infoStatus variable
 
   String? judul;
   String? instansi;
@@ -39,8 +40,7 @@ class AddFormState extends State<AddFormPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primaryColor,
-        title:
-            Text('Tambah Laporan', style: headerStyle(level: 3, dark: false)),
+        title: Text('Tambah Game', style: headerStyle(level: 3, dark: false)),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -55,14 +55,13 @@ class AddFormState extends State<AddFormPage> {
                     child: Column(
                       children: [
                         InputLayout(
-                            'Judul Laporan',
+                            'Judul',
                             TextFormField(
                                 onChanged: (String value) => setState(() {
                                       judul = value;
                                     }),
                                 validator: notEmptyValidator,
-                                decoration:
-                                    customInputDecoration("Judul laporan"))),
+                                decoration: customInputDecoration("Judul"))),
                         Container(
                           margin: EdgeInsets.symmetric(vertical: 10),
                         ),
@@ -77,7 +76,7 @@ class AddFormState extends State<AddFormPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(Icons.photo_camera),
-                                  Text(' Foto Pendukung',
+                                  Text(' Foto Akun',
                                       style: headerStyle(level: 3)),
                                 ],
                               )),
@@ -87,10 +86,10 @@ class AddFormState extends State<AddFormPage> {
                           child: imagePreview(),
                         ),
                         InputLayout(
-                            'Instansi',
+                            'Status Akun',
                             DropdownButtonFormField<String>(
-                                decoration: customInputDecoration('Instansi'),
-                                items: dataInstansi.map((e) {
+                                decoration: customInputDecoration('Status'),
+                                items: infoStatus.map((e) {
                                   return DropdownMenuItem<String>(
                                       child: Text(e), value: e);
                                 }).toList(),
@@ -100,7 +99,7 @@ class AddFormState extends State<AddFormPage> {
                                   });
                                 })),
                         InputLayout(
-                            "Deskripsi laporan",
+                            "Deskripsi Akun",
                             TextFormField(
                               onChanged: (String value) => setState(() {
                                 deskripsi = value;
@@ -120,7 +119,7 @@ class AddFormState extends State<AddFormPage> {
                                 addTransaksi(akun);
                               },
                               child: Text(
-                                'Kirim Laporan',
+                                'Kirim',
                                 style: headerStyle(level: 3, dark: false),
                               )),
                         )
@@ -178,7 +177,88 @@ class AddFormState extends State<AddFormPage> {
         });
   }
 
-  void addTransaksi(Akun akun) {
-    // Add your implementation for adding a transaction here
+  Future<String> uploadImage() async {
+    if (file == null) return '';
+
+    String uniqueFilename = DateTime.now().millisecondsSinceEpoch.toString();
+
+    try {
+      Reference dirUpload =
+          _storage.ref().child('upload/${_auth.currentUser!.uid}');
+      Reference storedDir = dirUpload.child(uniqueFilename);
+
+      await storedDir.putFile(File(file!.path));
+
+      return await storedDir.getDownloadURL();
+    } catch (e) {
+      return '';
+    }
+  }
+
+  Future<Position> getCurrentLocation() async {
+    bool isServiceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!isServiceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permantly denied, we cannot request permissions.');
+    }
+
+    return await Geolocator.getCurrentPosition();
+  }
+
+  void addTransaksi(Akun akun) async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      CollectionReference laporanCollection = _firestore.collection('laporan');
+
+      // Convert DateTime to Firestore Timestamp
+      Timestamp timestamp = Timestamp.fromDate(DateTime.now());
+
+      String url = await uploadImage();
+
+      String currentLocation = await getCurrentLocation().then((value) {
+        return '${value.latitude},${value.longitude}';
+      });
+
+      String maps = 'https://www.google.com/maps/place/$currentLocation';
+      final id = laporanCollection.doc().id;
+
+      await laporanCollection.doc(id).set({
+        'uid': _auth.currentUser!.uid,
+        'docId': id,
+        'judul': judul,
+        'instansi': instansi,
+        'deskripsi': deskripsi,
+        'gambar': url,
+        'nama': akun.nama,
+        'status': 'Posted', // posted, process, done
+        'tanggal': timestamp,
+        'maps': maps,
+      }).catchError((e) {
+        throw e;
+      });
+      Navigator.popAndPushNamed(context, '/dashboard');
+    } catch (e) {
+      final snackbar = SnackBar(content: Text(e.toString()));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 }

@@ -25,16 +25,16 @@ class _SplashPage extends State<SplashFull> {
     // nanti bagian ini diganti cek koneksi ke firebase dan cek login
     User? user = _auth.currentUser;
 
-  if (user != null) {
-    Future.delayed(Duration.zero, () {
-    // buat dashboard terlebih dahulu, lalu hapus komen line code dibawah ini 
-    //  Navigator.pushReplacementNamed(context, '/dashboard');
-    });
-  } else {
-    Future.delayed(Duration.zero, () {
-      Navigator.pushReplacementNamed(context, '/login');
-    });
-  }
+    if (user != null) {
+      Future.delayed(Duration.zero, () {
+        // buat dashboard terlebih dahulu, lalu hapus komen line code dibawah ini
+        //  Navigator.pushReplacementNamed(context, '/dashboard');
+      });
+    } else {
+      Future.delayed(Duration.zero, () {
+        Navigator.pushReplacementNamed(context, '/login');
+      });
+    }
     Future.delayed(Duration.zero, () {
       Navigator.pushReplacementNamed(context, '/register');
     });
@@ -45,7 +45,7 @@ class _SplashPage extends State<SplashFull> {
     return const MaterialApp(
         home: Scaffold(
       body: Center(
-        child: Text('Selamat datang di Aplikasi Laporan'),
+        child: Text('Selamat datang di Lunz Store'),
       ),
     ));
   }

@@ -17,6 +17,7 @@ void main() async {
   runApp(MaterialApp(
     title: 'Lapor Book',
     initialRoute: '/',
+    
     routes: {
       '/': (context) => const SplashPage(),
       '/login': (context) => LoginPage(),

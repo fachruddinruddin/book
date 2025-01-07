@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-var primaryColor = const Color(0xffF4A261);
-var warningColor = const Color(0xFFE9C46A);
-var dangerColor = const Color(0xFFE76F51);
-var successColor = const Color(0xFF2A9D8F);
+var primaryColor = const Color.fromARGB(255, 97, 131, 244);
+var warningColor = const Color.fromARGB(255, 106, 110, 233);
+var dangerColor = const Color.fromARGB(255, 81, 104, 231);
+var successColor = const Color.fromARGB(255, 42, 67, 157);
 var greyColor = const Color(0xFFAFAFAF);
 
 TextStyle headerStyle({int level = 1, bool dark = true}) {
-List<double> levelSize = [30, 24, 20, 14, 12];
+  List<double> levelSize = [30, 24, 20, 14, 12];
 
   return TextStyle(
       fontSize: levelSize[level - 1],
@@ -16,4 +16,5 @@ List<double> levelSize = [30, 24, 20, 14, 12];
 }
 
 var buttonStyle = ElevatedButton.styleFrom(
-  padding: const EdgeInsets.symmetric(vertical: 15), backgroundColor: primaryColor);
+    padding: const EdgeInsets.symmetric(vertical: 15),
+    backgroundColor: primaryColor);
